@@ -1,0 +1,75 @@
+<div
+    class="group relative h-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
+    <!-- Quick Action Icons -->
+    <div class="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
+        <button (click)="toggleWishlist()" [disabled]="wishlistLoading()" type="button"
+            [attr.aria-label]="inWishlist() ? 'Remove from Wishlist' : 'Add to Wishlist'"
+            class="w-7 h-7 bg-white dark:bg-gray-700 rounded-full border shadow-xs flex items-center justify-center transition-colors cursor-pointer"
+            [class]="inWishlist() ? 'text-red-500 border-red-200' : 'text-gray-400 border-gray-100 hover:text-red-500 hover:border-red-200'">
+            @if (wishlistLoading()) {
+            <i class="fa-solid fa-spinner fa-spin text-xs"></i>
+            } @else {
+            <i class="text-xs" [class]="inWishlist() ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+            }
+        </button>
+        <a [routerLink]="['/c-details', product().category._id]" aria-label="Same category"
+            class="w-7 h-7 bg-white dark:bg-gray-700 rounded-full border border-gray-100 dark:border-gray-600 shadow-xs flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:border-emerald-200 transition-colors">
+            <i class="fa-solid fa-arrows-rotate text-[11px]"></i>
+        </a>
+        <a [routerLink]="['/p-details', product()._id]" aria-label="Quick View"
+            class="w-7 h-7 bg-white dark:bg-gray-700 rounded-full border border-gray-100 dark:border-gray-600 shadow-xs flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:border-emerald-200 transition-colors">
+            <i class="fa-regular fa-eye text-[11px]"></i>
+        </a>
+    </div>
+
+    <div [routerLink]="['/p-details', product()._id]" class="cursor-pointer">
+        <!-- Product Image -->
+        <div class="w-full aspect-square flex items-center justify-center overflow-hidden mb-3 pt-2">
+            <img [src]="product().imageCover" [alt]="product().title" [title]="product().slug">
+        </div>
+
+        <!-- Product Info -->
+        <div>
+            <span class="text-xs text-gray-400 dark:text-gray-400 font-medium"> {{product().category.name}} </span>
+            <h3
+                class="text-sm font-semibold text-gray-800 dark:text-gray-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer truncate mt-0.5">
+                {{product().title}}
+            </h3>
+
+            <!-- Rating -->
+            <div class="flex items-center gap-1 mt-1">
+                <div class="flex items-center text-amber-400 text-xs gap-0.5 p-1">
+                    @for (star of [1,2,3,4,5].slice(0, product().ratingsAverage) ; track $index) {
+                    <i class="fa-solid fa-star"></i>
+                    }
+                    @if (product().ratingsAverage % 1 != 0) {
+                    <i class="fa-regular fa-star-half"></i>
+                    }
+                </div>
+                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium ml-1">
+                    {{product().ratingsAverage}}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price & Add to Cart -->
+    <div class="flex items-center justify-between mt-3 pt-1">
+        <div class="flex flex-col leading-tight">
+            @if (product().priceAfterDiscount) {
+            <span class="text-base font-bold text-emerald-600"> {{product().priceAfterDiscount | currency : 'EGP ' : 'code' : '1.0-0'}} </span>
+            <span class="text-xs text-gray-400 line-through"> {{product().price | currency : 'EGP ' : 'code' : '1.0-0'}} </span>
+            } @else {
+            <span class="text-base font-bold text-gray-900 dark:text-white"> {{product().price | currency : 'EGP ' : 'code' : '1.0-0'}} </span>
+            }
+        </div>
+        <button (click)="addToCart()" [disabled]="cartLoading()" type="button" aria-label="Add to cart"
+            class="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center transition-all shadow-xs cursor-pointer disabled:opacity-60">
+            @if (cartLoading()) {
+            <i class="fa-solid fa-spinner fa-spin text-xs"></i>
+            } @else {
+            <i class="fa-solid fa-plus text-xs"></i>
+            }
+        </button>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+.item{
+    background-image: linear-gradient(to right , #00c758e6 , #05df7280) , url(/images/home-slider-1.d79601a8.png) ;
+    min-height: 80vh;
+    background-position: center;
+    background-size: cover;
+}
+swiper-container::part(button-next),
+swiper-container::part(button-prev){
+    background-color: #fff;
+    width: 20px;
+    height: 20px;
+    padding: 15px;
+    font-weight: 900;
+    color: var(--main-color);
+    border-radius: 50%;
+    box-shadow: 0 0 15px #f1f1f1;
+}
+swiper-container::part(scrollbar){
+    --swiper-scrollbar-drag-bg-color : var(--second-color) !important;
+    background-color: #f1f1f1;
+}

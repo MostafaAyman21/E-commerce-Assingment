@@ -1,0 +1,90 @@
+<section class="min-h-[calc(100vh-140px)] bg-gray-50/60 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-7xl mx-auto">
+        @if (notFound()) {
+        <div class="bg-white rounded-3xl border border-gray-100 p-10 text-center shadow-xs max-w-2xl mx-auto">
+            <h1 class="text-2xl font-extrabold text-gray-900">Category not found</h1>
+            <a routerLink="/categories" class="mt-6 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-full text-sm">Back to Categories</a>
+        </div>
+        } @else {
+        <!-- Breadcrumb Navigation -->
+        <nav class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+            <a routerLink="/home" class="hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-xs"></i> <span>Home</span>
+            </a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <a routerLink="/categories" class="hover:text-emerald-600 transition-colors">Categories</a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="font-semibold text-gray-900">{{ category().name }}</span>
+        </nav>
+
+        <!-- Category header card -->
+        <div class="bg-white rounded-3xl border border-gray-100 p-5 sm:p-7 shadow-xs mb-8">
+            <div class="flex flex-col sm:flex-row items-center gap-5">
+                <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-50 border-4 border-emerald-50 shrink-0">
+                    @if (category().image) {
+                    <img [src]="category().image" [alt]="category().name" class="w-full h-full object-cover">
+                    }
+                </div>
+                <div class="text-center sm:text-left">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">{{ category().name }}</h1>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Explore products in this category</p>
+                    <span class="inline-block mt-2 text-xs font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">{{ results() }} products</span>
+                </div>
+                <a routerLink="/categories" class="sm:ms-auto inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                    <i class="fa-solid fa-arrow-left text-xs"></i> All Categories
+                </a>
+            </div>
+
+            <!-- Subcategories -->
+            @if (subCategories().length) {
+            <div class="mt-6 pt-5 border-t border-gray-100">
+                <h2 class="text-sm font-bold text-gray-900 mb-3">Subcategories</h2>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" (click)="selectSub(null)" class="px-4 py-2 rounded-full text-xs sm:text-sm font-medium border transition-colors cursor-pointer"
+                        [class]="!selectedSub() ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-emerald-500 hover:text-emerald-600'">All</button>
+                    @for (sub of subCategories(); track sub._id) {
+                    <button type="button" (click)="selectSub(sub._id)" class="px-4 py-2 rounded-full text-xs sm:text-sm font-medium border transition-colors cursor-pointer"
+                        [class]="selectedSub()?._id === sub._id ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-emerald-500 hover:text-emerald-600'">{{ sub.name }}</button>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2.5">
+            <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+            {{ selectedSub()?.name ?? 'All ' + (category().name ?? '') }}
+        </h2>
+
+        @if (isLoading()) {
+        <div class="py-24 flex flex-col items-center gap-3 text-emerald-600">
+            <i class="fa-solid fa-spinner fa-spin text-4xl"></i>
+            <span class="text-sm text-gray-500">Loading products...</span>
+        </div>
+        } @else if (products().length) {
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+            @for (product of products(); track product._id) {
+            <app-product-card [product]="product" />
+            }
+        </div>
+        @if (pages().length > 1) {
+        <nav class="flex items-center justify-center gap-1.5 mt-10" aria-label="Pagination">
+            @for (p of pages(); track p) {
+            <button type="button" (click)="goToPage(p)" class="w-10 h-10 rounded-xl border text-sm font-semibold cursor-pointer"
+                [class]="p === page() ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-emerald-500'">{{ p }}</button>
+            }
+        </nav>
+        }
+        } @else {
+        <div class="bg-white rounded-3xl border border-gray-100 p-10 text-center shadow-xs max-w-2xl mx-auto">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900">No products found</h2>
+            <p class="text-sm text-gray-500 mt-1">There are no products here yet. Check back soon!</p>
+            <a routerLink="/shop" class="mt-6 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-full text-sm">Browse All Products</a>
+        </div>
+        }
+        }
+    </div>
+</section>

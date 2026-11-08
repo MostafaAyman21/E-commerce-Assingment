@@ -1,0 +1,184 @@
+<section class="min-h-[calc(100vh-140px)] bg-gray-50/60 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+            <a routerLink="/home" class="hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-xs"></i> <span>Home</span>
+            </a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="font-semibold text-gray-900">Settings</span>
+        </nav>
+
+        <!-- Header Bar -->
+        <div class="pb-6 mb-6 border-b border-gray-200/80">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Account Settings</h1>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Manage your account details, password and addresses.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-4">
+                <div class="lg:sticky lg:top-36 bg-white rounded-3xl border border-gray-100 p-5 shadow-xs">
+                    <div class="flex items-center gap-3 pb-4 border-b border-gray-100">
+                        <div class="w-12 h-12 rounded-full bg-emerald-600 text-white text-lg font-bold uppercase flex items-center justify-center">
+                            {{ _AuthenticationService.userInfo().name?.charAt(0) }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-gray-900 truncate">{{ _AuthenticationService.userInfo().name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ _AuthenticationService.userEmail() || 'FreshCart member' }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 space-y-1 text-sm">
+                        @for (t of tabs; track t.key) {
+                        <button type="button" (click)="selectTab(t.key)" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-left transition-colors cursor-pointer"
+                            [class]="activeTab() === t.key ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'">
+                            <i class="w-4 text-center" [class]="t.icon"></i> {{ t.label }}
+                        </button>
+                        }
+                        <a routerLink="/allorders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-gray-600 hover:bg-gray-50">
+                            <i class="fa-solid fa-box w-4 text-center"></i> My Orders
+                        </a>
+                        <button type="button" (click)="_AuthenticationService.logOut()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-left text-red-600 hover:bg-red-50 cursor-pointer">
+                            <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content -->
+            <div class="lg:col-span-8 bg-white rounded-3xl border border-gray-100 p-5 sm:p-8 shadow-xs">
+                @switch (activeTab()) {
+                @case ('info') {
+                <h2 class="text-xl font-bold text-gray-900">Account Info</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Update your name, email or phone number.</p>
+                <form [formGroup]="infoForm" (ngSubmit)="updateInfo()" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label for="name" class="block text-xs font-semibold text-gray-700 mb-1">Name*</label>
+                        <input id="name" formControlName="name" class="fc-input" [class.invalid]="invalid(infoForm, 'name')" />
+                        @if (invalid(infoForm, 'name')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Name must be 3-20 characters</span></div> }
+                    </div>
+                    <div>
+                        <label for="email" class="block text-xs font-semibold text-gray-700 mb-1">Email</label>
+                        <input id="email" type="email" formControlName="email" placeholder="ali@example.com" class="fc-input" [class.invalid]="invalid(infoForm, 'email')" />
+                        @if (invalid(infoForm, 'email')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Please enter a valid email</span></div> }
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-xs font-semibold text-gray-700 mb-1">Phone</label>
+                        <input id="phone" type="tel" formControlName="phone" placeholder="01012345678" class="fc-input" [class.invalid]="invalid(infoForm, 'phone')" />
+                        @if (invalid(infoForm, 'phone')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Please enter a valid Egyptian phone number</span></div> }
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button type="submit" [disabled]="infoLoading()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-3 rounded-xl text-sm inline-flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-60">
+                            <i class="fa-solid" [class]="infoLoading() ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+                }
+
+                @case ('password') {
+                <h2 class="text-xl font-bold text-gray-900">Change Password</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Make sure your new password is strong and unique.</p>
+                <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="mt-6 space-y-4 max-w-md">
+                    <div>
+                        <label for="currentPassword" class="block text-xs font-semibold text-gray-700 mb-1">Current Password*</label>
+                        <input id="currentPassword" [type]="showPassword() ? 'text' : 'password'" formControlName="currentPassword" class="fc-input" [class.invalid]="invalid(passwordForm, 'currentPassword')" />
+                        @if (invalid(passwordForm, 'currentPassword')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Current password is required</span></div> }
+                    </div>
+                    <div>
+                        <label for="password" class="block text-xs font-semibold text-gray-700 mb-1">New Password*</label>
+                        <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" class="fc-input" [class.invalid]="invalid(passwordForm, 'password')" />
+                        @if (invalid(passwordForm, 'password')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>At least 8 characters with upper &amp; lower case letters, a number and a symbol</span></div> }
+                    </div>
+                    <div>
+                        <label for="rePassword" class="block text-xs font-semibold text-gray-700 mb-1">Confirm New Password*</label>
+                        <input id="rePassword" [type]="showPassword() ? 'text' : 'password'" formControlName="rePassword" class="fc-input"
+                            [class.invalid]="passwordForm.get('rePassword')?.touched && (passwordForm.get('rePassword')?.invalid || passwordForm.hasError('mismatch'))" />
+                        @if (passwordForm.get('rePassword')?.touched && (passwordForm.get('rePassword')?.invalid || passwordForm.hasError('mismatch'))) {
+                        <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Passwords do not match</span></div>
+                        }
+                    </div>
+                    <label class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer select-none">
+                        <input type="checkbox" [checked]="showPassword()" (change)="showPassword.set(!showPassword())" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                        Show passwords
+                    </label>
+                    <button type="submit" [disabled]="passwordLoading()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-3 rounded-xl text-sm inline-flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-60">
+                        <i class="fa-solid" [class]="passwordLoading() ? 'fa-spinner fa-spin' : 'fa-key'"></i> Update Password
+                    </button>
+                </form>
+                }
+
+                @case ('addresses') {
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">My Addresses</h2>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-1">Saved addresses make checkout faster.</p>
+                    </div>
+                    @if (!showAddressForm()) {
+                    <button type="button" (click)="showAddressForm.set(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-plus text-xs"></i> Add Address
+                    </button>
+                    }
+                </div>
+
+                @if (showAddressForm()) {
+                <form [formGroup]="addressForm" (ngSubmit)="addAddress()" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/90 border border-gray-100 rounded-2xl p-5">
+                    <div>
+                        <label for="addrName" class="block text-xs font-semibold text-gray-700 mb-1">Address Name*</label>
+                        <input id="addrName" formControlName="name" placeholder="Home, Work..." class="fc-input" [class.invalid]="invalid(addressForm, 'name')" />
+                        @if (invalid(addressForm, 'name')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Name is required</span></div> }
+                    </div>
+                    <div>
+                        <label for="addrCity" class="block text-xs font-semibold text-gray-700 mb-1">City*</label>
+                        <input id="addrCity" formControlName="city" placeholder="Cairo" class="fc-input" [class.invalid]="invalid(addressForm, 'city')" />
+                        @if (invalid(addressForm, 'city')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>City is required</span></div> }
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="addrDetails" class="block text-xs font-semibold text-gray-700 mb-1">Details*</label>
+                        <input id="addrDetails" formControlName="details" placeholder="Street, building, apartment" class="fc-input" [class.invalid]="invalid(addressForm, 'details')" />
+                        @if (invalid(addressForm, 'details')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>At least 5 characters</span></div> }
+                    </div>
+                    <div>
+                        <label for="addrPhone" class="block text-xs font-semibold text-gray-700 mb-1">Phone*</label>
+                        <input id="addrPhone" type="tel" formControlName="phone" placeholder="01012345678" class="fc-input" [class.invalid]="invalid(addressForm, 'phone')" />
+                        @if (invalid(addressForm, 'phone')) { <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Please enter a valid Egyptian phone number</span></div> }
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="submit" [disabled]="addressLoading()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2 cursor-pointer disabled:opacity-60">
+                            @if (addressLoading()) { <i class="fa-solid fa-spinner fa-spin"></i> } Save Address
+                        </button>
+                        <button type="button" (click)="showAddressForm.set(false); addressForm.reset()" class="px-5 py-2.5 border border-gray-200 bg-white rounded-xl text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">Cancel</button>
+                    </div>
+                </form>
+                }
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @for (address of addresses(); track address._id) {
+                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-gray-100" [class.opacity-60]="removingAddress() === address._id">
+                        <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div class="flex-1 min-w-0 text-sm">
+                            <p class="font-bold text-gray-900">{{ address.name }}</p>
+                            <p class="text-gray-600">{{ address.details }}</p>
+                            <p class="text-gray-600">{{ address.city }}</p>
+                            <p class="text-xs text-gray-400"><i class="fa-solid fa-phone text-[10px]"></i> {{ address.phone }}</p>
+                        </div>
+                        <button type="button" (click)="removeAddress(address._id)" [disabled]="removingAddress() === address._id" aria-label="Remove address"
+                            class="w-9 h-9 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center cursor-pointer">
+                            <i class="fa-regular" [class]="removingAddress() === address._id ? 'fa-solid fa-spinner fa-spin' : 'fa-trash-can'"></i>
+                        </button>
+                    </div>
+                    } @empty {
+                    <div class="md:col-span-2 rounded-2xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
+                        <i class="fa-solid fa-map-location-dot text-3xl mb-2"></i>
+                        <p class="text-sm">You don't have any saved addresses yet.</p>
+                    </div>
+                    }
+                </div>
+                }
+                }
+            </div>
+        </div>
+    </div>
+</section>

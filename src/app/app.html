@@ -1,0 +1,6 @@
+<!-- The navbar depends on the logged user (browser-only cookie), so it isn't hydrated from the server HTML. -->
+<app-navbar ngSkipHydration />
+<div class="m-1 p-1">
+  <router-outlet />
+</div>
+<app-footer />

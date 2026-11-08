@@ -1,0 +1,21 @@
+<section class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <!-- Section Title -->
+    <div class="flex items-center justify-between gap-2.5 mb-6">
+        <div class="flex items-center gap-2.5">
+            <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+            <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+                Featured <span class="text-emerald-600">Products</span>
+            </h2>
+        </div>
+        <a routerLink="/shop" class="text-sm font-semibold text-emerald-600 hover:underline">
+            View All <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+    <!-- Products Grid (Tailwind Display Grid) -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5">
+        @for (product of products(); track product._id) {
+        <app-product-card [product]="product" />
+        }
+    </div>
+</section>

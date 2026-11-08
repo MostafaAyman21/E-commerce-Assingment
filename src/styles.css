@@ -1,0 +1,53 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import 'tailwindcss';
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+/* Dark styles only apply under a `.dark` class (never set), so the design stays light
+   even when the device prefers dark mode — otherwise only parts of the page turn dark. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@utility container{
+	margin-inline: auto;
+}
+@theme{
+	--main-color : #16a34a ;
+	--second-color: #101828 ;
+}
+body{
+	font-family: "Saira Condensed", sans-serif;
+}
+.dotClass .owl-dot.active span{
+    background-color: var(--main-color) !important;
+}
+.dotClass .owl-dot span{
+    background-color: var(--second-color) !important;
+}
+
+.myToastr{
+	background-color: #161a28 ;
+	padding: 0.5rem;
+	border-radius: 1rem;
+	width: auto;
+	height: auto;
+	color: white;
+}
+
+/* Shared input style used by the pages that didn't exist in the original design */
+.fc-input {
+	@apply bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 transition-colors placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500;
+}
+.fc-input.invalid {
+	@apply border-red-500 focus:ring-red-400 focus:border-red-500;
+}
+.fc-error {
+	@apply p-2 mt-1.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center gap-1.5;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}

@@ -1,0 +1,125 @@
+<section class="min-h-[calc(100vh-120px)] bg-[#f8fafc] py-8 sm:py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center font-sans">
+    <div class="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-200/50 border border-gray-100 p-6 sm:p-9">
+
+        <!-- Card Title -->
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <i class="fa-solid text-xl" [class.fa-envelope]="step() === 1" [class.fa-shield-halved]="step() === 2" [class.fa-key]="step() === 3"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                @switch (step()) {
+                @case (1) { Forgot Password? }
+                @case (2) { Verify Reset Code }
+                @case (3) { Set New Password }
+                }
+            </h2>
+            <p class="text-gray-500 text-xs sm:text-sm mt-1">
+                @switch (step()) {
+                @case (1) { Enter your email and we'll send you a reset code }
+                @case (2) { We sent a code to <b class="text-gray-700">{{ emailForm.value.email }}</b> }
+                @case (3) { Choose a strong password you haven't used before }
+                }
+            </p>
+        </div>
+
+        <!-- Steps -->
+        <div class="flex items-center mb-6">
+            @for (s of [1, 2, 3]; track s; let last = $last) {
+            <div class="flex items-center" [class.flex-1]="!last">
+                <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors"
+                    [class]="step() > s ? 'bg-emerald-600 border-emerald-600 text-white' : step() === s ? 'border-emerald-600 text-emerald-600' : 'border-gray-200 text-gray-400'">
+                    @if (step() > s) { <i class="fa-solid fa-check text-[10px]"></i> } @else { {{ s }} }
+                </span>
+                @if (!last) {
+                <span class="flex-1 h-0.5 mx-2 rounded" [class]="step() > s ? 'bg-emerald-600' : 'bg-gray-200'"></span>
+                }
+            </div>
+            }
+        </div>
+
+        @if (msgError()) {
+        <div class="p-3 mb-4 text-xs text-red-800 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2" role="alert">
+            <i class="fa-solid fa-circle-exclamation text-red-600 text-sm shrink-0"></i>
+            <span>{{ msgError() }}</span>
+        </div>
+        }
+
+        @switch (step()) {
+        @case (1) {
+        <form [formGroup]="emailForm" (ngSubmit)="sendCode()" class="space-y-4">
+            <div>
+                <label for="email" class="block text-xs font-semibold text-gray-700 mb-1">Email*</label>
+                <input type="email" id="email" formControlName="email" placeholder="ali@example.com" class="fc-input"
+                    [class.invalid]="emailForm.get('email')?.invalid && emailForm.get('email')?.touched" />
+                @if (emailForm.get('email')?.invalid && emailForm.get('email')?.touched) {
+                <div class="fc-error" role="alert"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Please enter a valid email address</span></div>
+                }
+            </div>
+            <button type="submit" [disabled]="isLoading()" class="w-full text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-3 text-center flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                @if (isLoading()) { <i class="fa-solid fa-spinner fa-spin text-base"></i> <span>Sending...</span> }
+                @else { <i class="fa-solid fa-paper-plane text-sm"></i> <span>Send Reset Code</span> }
+            </button>
+        </form>
+        }
+
+        @case (2) {
+        <form [formGroup]="codeForm" (ngSubmit)="verifyCode()" class="space-y-4">
+            <div>
+                <label for="resetCode" class="block text-xs font-semibold text-gray-700 mb-1">Reset Code*</label>
+                <input type="text" id="resetCode" inputmode="numeric" maxlength="6" formControlName="resetCode" placeholder="123456"
+                    class="fc-input text-center tracking-[0.5em] text-lg!"
+                    [class.invalid]="codeForm.get('resetCode')?.invalid && codeForm.get('resetCode')?.touched" />
+                @if (codeForm.get('resetCode')?.invalid && codeForm.get('resetCode')?.touched) {
+                <div class="fc-error" role="alert"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Enter the numeric code from your email</span></div>
+                }
+            </div>
+            <button type="submit" [disabled]="isLoading()" class="w-full text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-3 text-center flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                @if (isLoading()) { <i class="fa-solid fa-spinner fa-spin text-base"></i> <span>Verifying...</span> }
+                @else { <i class="fa-solid fa-shield-halved text-sm"></i> <span>Verify Code</span> }
+            </button>
+            <div class="flex items-center justify-between text-xs">
+                <button type="button" (click)="step.set(1)" class="font-semibold text-gray-500 hover:text-emerald-600 cursor-pointer">
+                    <i class="fa-solid fa-arrow-left"></i> Change email
+                </button>
+                <button type="button" (click)="sendCode()" [disabled]="isLoading()" class="font-semibold text-emerald-600 hover:underline cursor-pointer">Resend code</button>
+            </div>
+        </form>
+        }
+
+        @case (3) {
+        <form [formGroup]="passwordForm" (ngSubmit)="resetPassword()" class="space-y-4">
+            <div>
+                <label for="newPassword" class="block text-xs font-semibold text-gray-700 mb-1">New Password*</label>
+                <div class="relative">
+                    <input [type]="showPassword() ? 'text' : 'password'" id="newPassword" formControlName="newPassword" placeholder="create a strong password"
+                        class="fc-input pr-10" [class.invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched" />
+                    <button type="button" (click)="showPassword.set(!showPassword())" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 cursor-pointer" aria-label="Toggle password visibility" tabindex="-1">
+                        <i class="fa-regular" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"></i>
+                    </button>
+                </div>
+                @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                <div class="fc-error" role="alert"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>At least 8 characters with upper &amp; lower case letters, a number and a symbol</span></div>
+                }
+            </div>
+            <div>
+                <label for="rePassword" class="block text-xs font-semibold text-gray-700 mb-1">Confirm Password*</label>
+                <input [type]="showPassword() ? 'text' : 'password'" id="rePassword" formControlName="rePassword" placeholder="confirm your password"
+                    class="fc-input" [class.invalid]="passwordForm.get('rePassword')?.touched && (passwordForm.get('rePassword')?.invalid || passwordForm.hasError('mismatch'))" />
+                @if (passwordForm.get('rePassword')?.touched && (passwordForm.get('rePassword')?.invalid || passwordForm.hasError('mismatch'))) {
+                <div class="fc-error" role="alert"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Passwords do not match</span></div>
+                }
+            </div>
+            <button type="submit" [disabled]="isLoading()" class="w-full text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-3 text-center flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                @if (isLoading()) { <i class="fa-solid fa-spinner fa-spin text-base"></i> <span>Saving...</span> }
+                @else { <i class="fa-solid fa-key text-sm"></i> <span>Reset Password</span> }
+            </button>
+        </form>
+        }
+        }
+
+        <p class="text-center text-xs sm:text-sm text-gray-500 pt-5">
+            Remember your password?
+            <a routerLink="/login" class="font-semibold text-emerald-600 hover:underline ms-1">Sign In</a>
+        </p>
+    </div>
+</section>

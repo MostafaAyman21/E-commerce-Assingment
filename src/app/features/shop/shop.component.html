@@ -1,0 +1,155 @@
+<section class="min-h-[calc(100vh-140px)] bg-gray-50/60 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+            <a routerLink="/home" class="hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-xs"></i> <span>Home</span>
+            </a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="font-semibold text-gray-900">Shop</span>
+        </nav>
+
+        <!-- Header Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-200/80">
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">All Products</h1>
+                    @if (!isLoading()) {
+                    <span class="text-xs sm:text-sm font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">
+                        {{ keyword() ? (products() | search : keyword()).length : results() }} products
+                    </span>
+                    }
+                </div>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Explore our complete product collection</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button (click)="showFilters.set(!showFilters())" type="button" class="lg:hidden inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-200 px-4 py-2 rounded-xl cursor-pointer">
+                    <i class="fa-solid fa-sliders"></i> Filters
+                </button>
+                <select (change)="setFilter({ sort: $any($event.target).value || null })" aria-label="Sort products"
+                    class="text-xs sm:text-sm bg-white border border-gray-200 rounded-xl py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                    @for (option of sortOptions; track option.value) {
+                    <option [value]="option.value" [selected]="option.value === sort()">{{ option.label }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- Filters Sidebar -->
+            <aside class="lg:col-span-3 lg:block" [class.hidden]="!showFilters()">
+                <div class="lg:sticky lg:top-36 bg-white rounded-3xl border border-gray-100 p-5 shadow-xs space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fa-solid fa-layer-group text-emerald-600 text-xs"></i> Categories</h3>
+                        <div class="space-y-1 text-sm max-h-64 overflow-y-auto">
+                            <button type="button" (click)="setFilter({ category: null })" class="w-full text-left px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                [class]="!category() ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'">All Categories</button>
+                            @for (c of categories(); track c._id) {
+                            <button type="button" (click)="setFilter({ category: c._id })" class="w-full text-left px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                [class]="category() === c._id ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'">{{ c.name }}</button>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-5">
+                        <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fa-solid fa-tag text-emerald-600 text-xs"></i> Brand</h3>
+                        <select (change)="setFilter({ brand: $any($event.target).value || null })" class="fc-input" aria-label="Brand">
+                            <option value="">All Brands</option>
+                            @for (b of brands(); track b._id) {
+                            <option [value]="b._id" [selected]="b._id === brand()">{{ b.name }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-5">
+                        <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fa-solid fa-coins text-emerald-600 text-xs"></i> Price (EGP)</h3>
+                        <form class="space-y-2" (submit)="$event.preventDefault(); setFilter({ minPrice: min.value || null, maxPrice: max.value || null })">
+                            <div class="flex items-center gap-2">
+                                <input #min type="number" min="0" placeholder="Min" [value]="minPrice()" class="fc-input" aria-label="Minimum price" />
+                                <span class="text-gray-400">-</span>
+                                <input #max type="number" min="0" placeholder="Max" [value]="maxPrice()" class="fc-input" aria-label="Maximum price" />
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-xl text-sm cursor-pointer">Apply</button>
+                        </form>
+                    </div>
+
+                    @if (hasFilters()) {
+                    <button (click)="clearFilters()" type="button" class="w-full inline-flex items-center justify-center gap-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 py-2 rounded-xl cursor-pointer">
+                        <i class="fa-solid fa-filter-circle-xmark"></i> Clear Filters
+                    </button>
+                    }
+                </div>
+            </aside>
+
+            <!-- Products -->
+            <div class="lg:col-span-9">
+                <!-- Active filters -->
+                @if (hasFilters()) {
+                <div class="flex flex-wrap items-center gap-2 mb-4 text-xs">
+                    @if (keyword()) {
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1">Search: "{{ keyword() }}"
+                        <button (click)="setFilter({ keyword: null })" type="button" class="text-gray-400 hover:text-red-500 cursor-pointer" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button></span>
+                    }
+                    @if (categoryName()) {
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1">{{ categoryName() }}
+                        <button (click)="setFilter({ category: null })" type="button" class="text-gray-400 hover:text-red-500 cursor-pointer" aria-label="Clear category"><i class="fa-solid fa-xmark"></i></button></span>
+                    }
+                    @if (brandName()) {
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1">{{ brandName() }}
+                        <button (click)="setFilter({ brand: null })" type="button" class="text-gray-400 hover:text-red-500 cursor-pointer" aria-label="Clear brand"><i class="fa-solid fa-xmark"></i></button></span>
+                    }
+                    @if (minPrice() || maxPrice()) {
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1">{{ minPrice() || 0 }} - {{ maxPrice() || '∞' }} EGP
+                        <button (click)="setFilter({ minPrice: null, maxPrice: null })" type="button" class="text-gray-400 hover:text-red-500 cursor-pointer" aria-label="Clear price"><i class="fa-solid fa-xmark"></i></button></span>
+                    }
+                </div>
+                }
+
+                @if (isLoading()) {
+                <div class="py-24 flex flex-col items-center gap-3 text-emerald-600">
+                    <i class="fa-solid fa-spinner fa-spin text-4xl"></i>
+                    <span class="text-sm text-gray-500">Loading products...</span>
+                </div>
+                } @else {
+                @let shown = products() | search : keyword();
+                @if (shown.length) {
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
+                    @for (product of shown; track product._id) {
+                    <app-product-card [product]="product" />
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (pages().length > 1) {
+                <nav class="flex items-center justify-center gap-1.5 mt-10" aria-label="Pagination">
+                    <button type="button" (click)="goToPage(page() - 1)" [disabled]="page() === 1" aria-label="Previous page"
+                        class="w-10 h-10 rounded-xl border border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-600 disabled:opacity-40 cursor-pointer">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    @for (p of pages(); track p) {
+                    <button type="button" (click)="goToPage(p)" class="w-10 h-10 rounded-xl border text-sm font-semibold cursor-pointer transition-colors"
+                        [class]="p === page() ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-emerald-500 hover:text-emerald-600'">{{ p }}</button>
+                    }
+                    <button type="button" (click)="goToPage(page() + 1)" [disabled]="page() === pages().length" aria-label="Next page"
+                        class="w-10 h-10 rounded-xl border border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-600 disabled:opacity-40 cursor-pointer">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </nav>
+                }
+                } @else {
+                <div class="bg-white rounded-3xl border border-gray-100 p-10 text-center shadow-xs">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900">No products found</h2>
+                    <p class="text-sm text-gray-500 mt-1">Try adjusting your search or filters.</p>
+                    <button (click)="clearFilters()" type="button" class="mt-6 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-full text-sm cursor-pointer">Clear Filters</button>
+                </div>
+                }
+                }
+            </div>
+        </div>
+    </div>
+</section>

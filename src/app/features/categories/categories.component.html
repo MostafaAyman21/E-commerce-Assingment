@@ -1,0 +1,39 @@
+<section class="min-h-[calc(100vh-140px)] bg-gray-50/60 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+            <a routerLink="/home" class="hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-xs"></i> <span>Home</span>
+            </a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="font-semibold text-gray-900">Categories</span>
+        </nav>
+
+        <!-- Header Bar -->
+        <div class="pb-6 mb-6 border-b border-gray-200/80">
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">All Categories</h1>
+                <span class="text-xs sm:text-sm font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">
+                    {{ categories().length }} categories
+                </span>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Browse our wide range of product categories</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+            @for (category of categories(); track category._id) {
+            <a [routerLink]="['/c-details', category._id]"
+                class="group bg-white rounded-2xl sm:rounded-3xl border border-gray-100 overflow-hidden shadow-2xs hover:shadow-md hover:border-emerald-200 transition-all">
+                <div class="aspect-square bg-gray-50 overflow-hidden">
+                    <img [src]="category.image" [alt]="category.name" [title]="category.slug" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                </div>
+                <div class="p-4 text-center">
+                    <h3 class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-emerald-600">{{ category.name }}</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ subsByCategory()[category._id]?.length || 0 }} subcategories</p>
+                </div>
+            </a>
+            }
+        </div>
+    </div>
+</section>

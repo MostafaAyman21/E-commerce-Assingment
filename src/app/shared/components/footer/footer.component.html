@@ -1,0 +1,232 @@
+<footer class="bg-gray-50 dark:bg-[#0B1527] text-gray-600 dark:text-slate-400 border-t border-gray-200/80 dark:border-slate-800/80 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+    <!-- Top Grid Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12">
+      <!-- Left Column: Branding, Description, Contact & Social -->
+      <div class="lg:col-span-4 space-y-6">
+        <!-- Logo Badge -->
+        <a routerLink="/" class="inline-flex items-center gap-2.5 bg-white px-4 py-2 rounded-xl shadow-xs border border-gray-200/80 dark:border-transparent transition-transform hover:scale-102">
+          <!-- FreshCart Trolley Cart Icon -->
+          <svg class="w-7 h-7 text-emerald-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M2.5 3H5.2L7.3 14.3C7.45 15.1 8.15 15.7 9 15.7H18.5C19.25 15.7 19.95 15.15 20.15 14.4L22 7.5H6.2"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <line x1="9" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="8.5" y1="13" x2="17.5" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <circle cx="9" cy="19.5" r="1.5" fill="currentColor" />
+            <circle cx="18" cy="19.5" r="1.5" fill="currentColor" />
+          </svg>
+          <span class="text-xl font-bold tracking-tight text-gray-900">FreshCart</span>
+        </a>
+
+        <!-- Description -->
+        <p class="text-sm leading-relaxed text-gray-600 dark:text-slate-400 max-w-sm">
+          FreshCart is your one-stop destination for quality products. From fashion to electronics, we bring you the best brands at competitive prices with a seamless shopping experience.
+        </p>
+
+        <!-- Contact Information -->
+        <div class="space-y-3 text-sm text-gray-600 dark:text-slate-400">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-phone text-emerald-500 text-sm w-4 text-center"></i>
+            <a href="tel:+18001234567" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              +1 (800) 123-4567
+            </a>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-envelope text-emerald-500 text-sm w-4 text-center"></i>
+            <a href="mailto:support&#64;freshcart.com" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              support&#64;freshcart.com
+            </a>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-location-dot text-emerald-500 text-sm w-4 text-center mt-0.5"></i>
+            <span>123 Commerce Street, New York, NY 10001</span>
+          </div>
+        </div>
+
+        <!-- Social Media Icons -->
+        <div class="flex items-center gap-2.5 pt-1">
+          <a
+            href="#"
+            class="w-9 h-9 rounded-full bg-gray-200/70 dark:bg-slate-800/80 text-gray-600 dark:text-slate-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white transition-all shadow-xs"
+            aria-label="Facebook">
+            <i class="fa-brands fa-facebook-f text-xs"></i>
+          </a>
+          <a
+            href="#"
+            class="w-9 h-9 rounded-full bg-gray-200/70 dark:bg-slate-800/80 text-gray-600 dark:text-slate-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white transition-all shadow-xs"
+            aria-label="Twitter">
+            <i class="fa-brands fa-twitter text-xs"></i>
+          </a>
+          <a
+            href="#"
+            class="w-9 h-9 rounded-full bg-gray-200/70 dark:bg-slate-800/80 text-gray-600 dark:text-slate-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white transition-all shadow-xs"
+            aria-label="Instagram">
+            <i class="fa-brands fa-instagram text-xs"></i>
+          </a>
+          <a
+            href="#"
+            class="w-9 h-9 rounded-full bg-gray-200/70 dark:bg-slate-800/80 text-gray-600 dark:text-slate-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white transition-all shadow-xs"
+            aria-label="YouTube">
+            <i class="fa-brands fa-youtube text-xs"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Columns: Navigation Links -->
+      <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+        <!-- Column 1: Shop -->
+        <div>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">Shop</h3>
+          <ul class="space-y-3 text-sm">
+            <li>
+              <a routerLink="/shop" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                All Products
+              </a>
+            </li>
+            <li>
+              <a routerLink="/categories" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Categories
+              </a>
+            </li>
+            <li>
+              <a routerLink="/brands" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Brands
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/c-details', '6439d2d167d9aa4ca970649f']" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Electronics
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/c-details', '6439d5b90049ad0b52b90048']" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Men's Fashion
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/c-details', '6439d58a0049ad0b52b9003f']" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Women's Fashion
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 2: Account -->
+        <div>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">Account</h3>
+          <ul class="space-y-3 text-sm">
+            <li>
+              <a routerLink="/settings" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                My Account
+              </a>
+            </li>
+            <li>
+              <a routerLink="/allorders" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Order History
+              </a>
+            </li>
+            <li>
+              <a routerLink="/wishlist" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Wishlist
+              </a>
+            </li>
+            <li>
+              <a routerLink="/cart" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Shopping Cart
+              </a>
+            </li>
+            <li>
+              <a routerLink="/login" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Sign In
+              </a>
+            </li>
+            <li>
+              <a routerLink="/register" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Create Account
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Support -->
+        <div>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
+          <ul class="space-y-3 text-sm">
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Contact Us
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Help Center
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Shipping Info
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Returns & Refunds
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Track Order
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Legal -->
+        <div>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">Legal</h3>
+          <ul class="space-y-3 text-sm">
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Terms of Service
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-emerald-600 dark:hover:text-white transition-colors">
+                Cookie Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright & Payment Methods Bar -->
+    <div class="border-t border-gray-200/80 dark:border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
+      <!-- Copyright -->
+      <p>© 2026 FreshCart. All rights reserved.</p>
+
+      <!-- Payment Methods -->
+      <div class="flex items-center gap-5 sm:gap-6">
+        <div class="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-slate-300 transition-colors">
+          <i class="fa-brands fa-cc-visa text-base"></i>
+          <span>Visa</span>
+        </div>
+        <div class="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-slate-300 transition-colors">
+          <i class="fa-brands fa-cc-mastercard text-base"></i>
+          <span>Mastercard</span>
+        </div>
+        <div class="flex items-center gap-1.5 hover:text-gray-700 dark:hover:text-slate-300 transition-colors">
+          <i class="fa-brands fa-cc-paypal text-base"></i>
+          <span>PayPal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,27 @@
+<section class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between gap-2.5 mb-6">
+        <div class="flex items-center gap-2.5">
+            <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+            <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+                Top <span class="text-emerald-600">Brands</span>
+            </h2>
+        </div>
+        <a routerLink="/brands" class="text-sm font-semibold text-emerald-600 hover:underline">
+            View All <i class="fa-solid fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+    @if (brands().length) {
+    <owl-carousel-o class="dotClass" [options]="customOptions">
+        @for (brand of brands(); track brand._id) {
+        <ng-template carouselSlide [id]="brand._id">
+            <a [routerLink]="['/b-details', brand._id]"
+                class="block bg-white border-2 border-gray-100 rounded-2xl p-3 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all text-center">
+                <img [src]="brand.image" [alt]="brand.name" [title]="brand.slug" class="w-full h-20 object-contain">
+                <span class="text-xs font-semibold text-gray-500">{{ brand.name }}</span>
+            </a>
+        </ng-template>
+        }
+    </owl-carousel-o>
+    }
+</section>

@@ -1,0 +1,400 @@
+<section class="min-h-[calc(100vh-140px)] bg-gray-50/60 dark:bg-gray-950 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-200">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- ======================================================== -->
+        <!-- Breadcrumb Navigation -->
+        <!-- ======================================================== -->
+        <nav class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-6" aria-label="Breadcrumb">
+            <a routerLink="/home" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-xs"></i>
+                <span>Home</span>
+            </a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="font-semibold text-gray-900 dark:text-white">Shopping Cart</span>
+        </nav>
+
+        @if (isLoading()) {
+        <div class="py-24 flex flex-col items-center gap-3 text-emerald-600">
+            <i class="fa-solid fa-spinner fa-spin text-4xl"></i>
+            <span class="text-sm text-gray-500">Loading your cart...</span>
+        </div>
+        }
+        @else if (CartDetails().data && CartDetails().data.products.length > 0) {
+
+        <!-- Cart Header Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-200/80 dark:border-gray-800">
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                        Shopping Cart
+                    </h1>
+                    <span class="text-xs sm:text-sm font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+                        {{ CartDetails().numOfCartItems }} {{ CartDetails().numOfCartItems === 1 ? 'item' : 'items' }}
+                    </span>
+                </div>
+                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Review your selected items, manage quantities, and proceed to checkout.
+                </p>
+            </div>
+
+            <!-- Clear Cart Action Button -->
+            <div class="flex items-center gap-3">
+                @if (!confirmClear()) {
+                <button (click)="confirmClear.set(true)" type="button"
+                    class="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200/80 dark:border-red-900/60 px-4 py-2 rounded-xl transition-all active:scale-95 cursor-pointer shadow-2xs">
+                    <i class="fa-regular fa-trash-can text-sm"></i>
+                    <span>Clear Cart</span>
+                </button>
+                } @else {
+                <span class="text-xs sm:text-sm text-gray-600">Remove all items?</span>
+                <button (click)="clearCart()" type="button" class="text-xs sm:text-sm font-semibold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl cursor-pointer">Yes, clear</button>
+                <button (click)="confirmClear.set(false)" type="button" class="text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-xl cursor-pointer">Cancel</button>
+                }
+            </div>
+        </div>
+
+        <!-- Main Content Layout (Responsive 12-Column Grid) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- ==================================================== -->
+            <!-- Left Column: Products List (8 cols) -->
+            <!-- ==================================================== -->
+            <div class="lg:col-span-8 space-y-4">
+
+                <!-- Free Delivery Banner -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 sm:p-5 shadow-2xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-truck-fast text-base"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                <span>Great news! Your order ships with</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 font-extrabold">FREE Delivery</span>
+                            </p>
+                            <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full overflow-hidden mt-2">
+                                <div class="bg-emerald-500 h-full rounded-full w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Items Cards -->
+                <div class="space-y-3.5">
+                    @for (item of CartDetails().data.products; track item.product._id) {
+                    <div class="bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-100 dark:border-gray-800 p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-all duration-200"
+                        [class.opacity-60]="isItemLoading(item.product._id)">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+
+                            <!-- Product Image Thumbnail -->
+                            <a [routerLink]="['/p-details', item.product._id]" class="relative w-24 h-24 sm:w-28 sm:h-28 bg-gray-50 dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-2 shrink-0 flex items-center justify-center overflow-hidden group">
+                                <img [src]="item.product.imageCover" [alt]="item.product.title"
+                                    class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105" />
+                            </a>
+
+                            <!-- Product Details -->
+                            <div class="flex-1 min-w-0 w-full sm:w-auto">
+                                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                    <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-900/50">
+                                        {{ item.product.category.name }}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 font-medium">
+                                        <i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                                        {{ item.product.ratingsAverage }}
+                                    </span>
+                                </div>
+                                <a [routerLink]="['/p-details', item.product._id]">
+                                    <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate hover:text-emerald-600" [title]="item.product.title">
+                                        {{ item.product.title }}
+                                    </h3>
+                                </a>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Unit Price:</span>
+                                    <span class="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
+                                        {{ item.price }} EGP
+                                    </span>
+                                    @if (item.product.quantity > 0) {
+                                    <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        In Stock
+                                    </span>
+                                    }
+                                </div>
+
+                                <!-- ============================================== -->
+                                <!-- Mobile Actions (Quantity & Subtotal & Remove) -->
+                                <!-- Visible on small screens (< sm) -->
+                                <!-- ============================================== -->
+                                <div class="flex sm:hidden items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                                    <!-- Counter Box -->
+                                    <div class="inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/60 p-0.5 shadow-2xs">
+                                        <button (click)="updateCartCount(item.product._id, item.count - 1)" [disabled]="isItemLoading(item.product._id)" type="button" aria-label="Decrease quantity"
+                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                                            <i class="fa-solid fa-minus text-[11px]"></i>
+                                        </button>
+                                        <span class="w-9 text-center font-bold text-sm text-gray-900 dark:text-white select-none">
+                                            {{ item.count }}
+                                        </span>
+                                        <button (click)="updateCartCount(item.product._id, item.count + 1)" [disabled]="isItemLoading(item.product._id)" type="button" aria-label="Increase quantity"
+                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                                            <i class="fa-solid fa-plus text-[11px]"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Subtotal & Trash Button -->
+                                    <div class="flex items-center gap-3">
+                                        <div class="text-right">
+                                            <div class="text-[10px] text-gray-400 uppercase font-medium">Subtotal</div>
+                                            <div class="text-base font-bold text-emerald-600 dark:text-emerald-400">
+                                                {{ item.price * item.count }} EGP
+                                            </div>
+                                        </div>
+                                        <button (click)="removeFromCart(item.product._id)" [disabled]="isItemLoading(item.product._id)" type="button" aria-label="Remove item"
+                                            class="w-8 h-8 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center transition-colors cursor-pointer">
+                                            <i class="fa-regular fa-trash-can text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ============================================== -->
+                            <!-- Desktop Actions (Quantity, Subtotal, Remove) -->
+                            <!-- Hidden on mobile, visible on sm+ screens -->
+                            <!-- ============================================== -->
+                            <div class="hidden sm:flex items-center gap-6 shrink-0 ms-auto">
+                                <!-- Quantity Counter -->
+                                <div class="inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/60 p-0.5 shadow-2xs">
+                                    <button (click)="updateCartCount(item.product._id, item.count - 1)" [disabled]="isItemLoading(item.product._id)" type="button" aria-label="Decrease quantity"
+                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                                        <i class="fa-solid text-[11px]" [class]="item.count > 1 ? 'fa-minus' : 'fa-trash-can text-red-500'"></i>
+                                    </button>
+                                    <span class="w-9 text-center font-bold text-sm text-gray-900 dark:text-white select-none">
+                                        @if (isItemLoading(item.product._id)) { <i class="fa-solid fa-spinner fa-spin text-xs text-emerald-600"></i> } @else { {{ item.count }} }
+                                    </span>
+                                    <button (click)="updateCartCount(item.product._id, item.count + 1)" [disabled]="isItemLoading(item.product._id)" type="button" aria-label="Increase quantity"
+                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                                        <i class="fa-solid fa-plus text-[11px]"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Subtotal -->
+                                <div class="text-right min-w-[90px]">
+                                    <div class="text-[11px] text-gray-400 dark:text-gray-500 uppercase font-medium">Subtotal</div>
+                                    <div class="text-base font-extrabold text-gray-900 dark:text-white">
+                                        {{ item.price * item.count }} <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">EGP</span>
+                                    </div>
+                                </div>
+
+                                <!-- Remove Button -->
+                                <button (click)="removeFromCart(item.product._id)" [disabled]="isItemLoading(item.product._id)" type="button" aria-label="Remove item"
+                                    class="w-9 h-9 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center transition-all cursor-pointer">
+                                    <i class="fa-regular fa-trash-can text-base"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- Left Column Footer (Continue Shopping link) -->
+                <div class="pt-2 flex items-center justify-between">
+                    <a routerLink="/shop" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                        <span>Continue Shopping</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- Right Column: Order Summary Card (4 cols) -->
+            <!-- ==================================================== -->
+            <div class="lg:col-span-4">
+                <div class="sticky top-36 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-5 sm:p-7 shadow-xs">
+
+                    <!-- Card Header -->
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight pb-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <span>Order Summary</span>
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            {{ CartDetails().numOfCartItems }} {{ CartDetails().numOfCartItems === 1 ? 'item' : 'items' }}
+                        </span>
+                    </h2>
+
+                    <!-- Coupon Code Input Box -->
+                    <form class="my-5" (submit)="$event.preventDefault(); applyCoupon(coupon.value)">
+                        <label for="coupon" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Have a coupon code?
+                        </label>
+                        <div class="relative flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <i class="fa-solid fa-tag text-xs"></i>
+                            </div>
+                            <input #coupon type="text" id="coupon" placeholder="FRESH2026"
+                                class="w-full pl-9 pr-24 py-2.5 text-xs sm:text-sm bg-gray-50/70 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 uppercase tracking-wider text-gray-900 dark:text-white transition-all placeholder:text-gray-400" />
+                            <button type="submit" [disabled]="couponLoading()"
+                                class="absolute right-1 px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 rounded-lg transition-all cursor-pointer disabled:opacity-60">
+                                @if (couponLoading()) { <i class="fa-solid fa-spinner fa-spin"></i> } @else { Apply }
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Price Breakdown -->
+                    <div class="space-y-3 text-sm border-t border-gray-100 dark:border-gray-800 pt-4">
+                        <div class="flex items-center justify-between text-gray-600 dark:text-gray-400">
+                            <span>Items Subtotal</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ CartDetails().data.totalCartPrice }} EGP</span>
+                        </div>
+                        <div class="flex items-center justify-between text-gray-600 dark:text-gray-400">
+                            <span class="flex items-center gap-1.5">
+                                <span>Estimated Shipping</span>
+                                <i class="fa-regular fa-circle-question text-xs text-gray-400" title="Free on every order"></i>
+                            </span>
+                            <span class="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <i class="fa-solid fa-check text-xs"></i> FREE
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-gray-600 dark:text-gray-400">
+                            <span>Estimated Tax</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">0.00 EGP</span>
+                        </div>
+                        <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+                            <span>Promotional Discount</span>
+                            <span class="font-semibold">- 0.00 EGP</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Calculation Row -->
+                    <div class="border-t border-dashed border-gray-200 dark:border-gray-700 my-4 pt-4">
+                        <div class="flex items-baseline justify-between">
+                            <div>
+                                <span class="text-base font-bold text-gray-900 dark:text-white">Total Amount</span>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Including VAT & taxes</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">
+                                    {{ CartDetails().data.totalCartPrice }}
+                                </span>
+                                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400 ml-1">EGP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkout & Continue Actions -->
+                    <div class="space-y-3 pt-2">
+                        <a [routerLink]="['/payment', CartDetails().cartId]"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2.5 shadow-sm hover:shadow-md hover:shadow-emerald-600/20 transition-all cursor-pointer text-center text-sm sm:text-base">
+                            <i class="fa-solid fa-shield-halved text-sm"></i>
+                            <span>Proceed to Checkout</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                        <a routerLink="/shop"
+                            class="w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 font-medium py-3 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer text-center text-xs sm:text-sm border border-gray-200/80 dark:border-gray-700">
+                            <i class="fa-solid fa-cart-plus text-xs"></i>
+                            <span>Add More Items</span>
+                        </a>
+                    </div>
+
+                    <!-- Guarantees & Payment Badges -->
+                    <div class="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800 space-y-3.5">
+                        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-lock text-xs"></i>
+                            </div>
+                            <span>256-Bit SSL Encrypted Secure Checkout</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-rotate-left text-xs"></i>
+                            </div>
+                            <span>14 Days Money Back Easy Guarantee</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-truck-fast text-xs"></i>
+                            </div>
+                            <span>Fast & Reliable Express Doorstep Delivery</span>
+                        </div>
+
+                        <!-- Payment Methods Icons -->
+                        <div class="pt-2 flex items-center justify-center gap-2 text-gray-400 text-lg">
+                            <span class="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                <i class="fa-brands fa-cc-visa text-sm mr-1 text-blue-600"></i> VISA
+                            </span>
+                            <span class="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                <i class="fa-brands fa-cc-mastercard text-sm mr-1 text-red-500"></i> Master
+                            </span>
+                            <span class="px-2.5 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                <i class="fa-solid fa-money-bill-wave text-sm mr-1 text-emerald-600"></i> Cash
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        @else {
+        <div class="py-10 sm:py-16">
+            <div class="max-w-2xl mx-auto bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-8 sm:p-12 text-center shadow-xs">
+
+                <!-- Empty Cart Icon with Subtle Pulse -->
+                <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-emerald-50 dark:bg-emerald-950/40 animate-ping opacity-25"></div>
+                    <div class="w-24 h-24 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-inner">
+                        <i class="fa-solid fa-cart-shopping text-3xl"></i>
+                    </div>
+                </div>
+
+                <!-- Heading & Descriptive Message -->
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                    Your Shopping Cart is Empty
+                </h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm sm:text-base mt-2 max-w-md mx-auto leading-relaxed">
+                    Looks like you haven't added anything to your cart yet. Explore our wide variety of fresh groceries and best deals!
+                </p>
+
+                <!-- CTA Action Buttons -->
+                <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a routerLink="/shop" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-8 py-3.5 rounded-full shadow-sm hover:shadow transition-all text-sm cursor-pointer">
+                        <i class="fa-solid fa-bag-shopping text-sm"></i>
+                        <span>Start Shopping</span>
+                        <i class="fa-solid fa-arrow-right text-xs ml-1"></i>
+                    </a>
+                    <a routerLink="/home" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium px-6 py-3.5 rounded-full border border-gray-200 dark:border-gray-700 transition-all text-sm cursor-pointer">
+                        <span>Explore Home</span>
+                    </a>
+                </div>
+
+                <!-- Value Proposition Perks Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 text-left">
+                    <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-truck text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-900 dark:text-white">Free Delivery</div>
+                            <div class="text-[11px] text-gray-500 dark:text-gray-400">On every order</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-leaf text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-900 dark:text-white">100% Fresh</div>
+                            <div class="text-[11px] text-gray-500 dark:text-gray-400">Top Quality Products</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-headset text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-900 dark:text-white">24/7 Support</div>
+                            <div class="text-[11px] text-gray-500 dark:text-gray-400">Dedicated Help Team</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</section>

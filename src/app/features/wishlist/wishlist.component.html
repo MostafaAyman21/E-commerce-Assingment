@@ -1,0 +1,88 @@
+<section class="min-h-[calc(100vh-140px)] bg-gray-50/60 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+            <a routerLink="/home" class="hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-house text-xs"></i> <span>Home</span>
+            </a>
+            <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="font-semibold text-gray-900">Wishlist</span>
+        </nav>
+
+        @if (isLoading()) {
+        <div class="py-24 flex flex-col items-center gap-3 text-emerald-600">
+            <i class="fa-solid fa-spinner fa-spin text-4xl"></i>
+            <span class="text-sm text-gray-500">Loading your wishlist...</span>
+        </div>
+        } @else if (wishlistProducts().length) {
+        <!-- Header Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-200/80">
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">My Wishlist</h1>
+                    <span class="text-xs sm:text-sm font-semibold bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-200">
+                        {{ wishlistProducts().length }} {{ wishlistProducts().length === 1 ? 'item' : 'items' }}
+                    </span>
+                </div>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Products you saved for later.</p>
+            </div>
+            <a routerLink="/cart" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                Go to Cart <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+        <div class="space-y-3.5">
+            @for (product of wishlistProducts(); track product._id) {
+            <div class="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-all"
+                [class.opacity-60]="_ShopActionsService.wishlistLoading().includes(product._id)">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                    <a [routerLink]="['/p-details', product._id]" class="w-24 h-24 sm:w-28 sm:h-28 bg-gray-50 rounded-2xl border border-gray-100 p-2 shrink-0 flex items-center justify-center overflow-hidden group">
+                        <img [src]="product.imageCover" [alt]="product.title" class="w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105" />
+                    </a>
+                    <div class="flex-1 min-w-0 w-full">
+                        <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                            <span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">{{ product.category.name }}</span>
+                            <span class="text-xs text-gray-400 flex items-center gap-1 font-medium"><i class="fa-solid fa-star text-amber-400 text-[10px]"></i> {{ product.ratingsAverage }}</span>
+                        </div>
+                        <a [routerLink]="['/p-details', product._id]">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 truncate hover:text-emerald-600" [title]="product.title">{{ product.title }}</h3>
+                        </a>
+                        <p class="text-base font-extrabold text-gray-900 mt-1">{{ product.price }} <span class="text-xs font-semibold text-emerald-600">EGP</span></p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+                        <button (click)="moveToCart(product._id)" [disabled]="_ShopActionsService.cartLoading().includes(product._id)" type="button"
+                            class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm cursor-pointer disabled:opacity-60">
+                            <i class="fa-solid text-xs" [class]="_ShopActionsService.cartLoading().includes(product._id) ? 'fa-spinner fa-spin' : 'fa-cart-plus'"></i>
+                            <span>Move to Cart</span>
+                        </button>
+                        <button (click)="removeFromWishlist(product._id)" type="button" aria-label="Remove from wishlist"
+                            class="w-10 h-10 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 border border-gray-200 flex items-center justify-center transition-all cursor-pointer">
+                            <i class="fa-regular fa-trash-can text-base"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="py-10 sm:py-16">
+            <div class="max-w-2xl mx-auto bg-white rounded-3xl border border-gray-100 p-8 sm:p-12 text-center shadow-xs">
+                <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-red-50 animate-ping opacity-25"></div>
+                    <div class="w-24 h-24 rounded-full bg-red-50 border border-red-100 flex items-center justify-center text-red-400 shadow-inner">
+                        <i class="fa-regular fa-heart text-3xl"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Your Wishlist is Empty</h2>
+                <p class="text-gray-500 text-sm sm:text-base mt-2 max-w-md mx-auto leading-relaxed">
+                    Save the products you love by tapping the heart icon, and find them here anytime.
+                </p>
+                <a routerLink="/shop" class="mt-8 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-8 py-3.5 rounded-full shadow-sm transition-all text-sm">
+                    <i class="fa-solid fa-bag-shopping text-sm"></i> <span>Explore Products</span>
+                </a>
+            </div>
+        </div>
+        }
+    </div>
+</section>

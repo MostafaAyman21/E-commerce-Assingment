@@ -1,0 +1,304 @@
+@if (notFound()) {
+<section class="min-h-[60vh] flex items-center justify-center px-4 font-sans">
+    <div class="text-center">
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-3xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Product not found</h1>
+        <p class="text-gray-500 mt-1">The product you are looking for doesn't exist or was removed.</p>
+        <a routerLink="/shop" class="mt-6 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-full text-sm">Back to Shop</a>
+    </div>
+</section>
+} @else if (p_details()._id) {
+<section class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
+    <!-- Breadcrumb -->
+    <nav class="max-w-6xl mx-auto flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+        <a routerLink="/home" class="hover:text-emerald-600 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-house text-xs"></i> Home</a>
+        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        <a routerLink="/shop" class="hover:text-emerald-600 transition-colors">Shop</a>
+        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        <a [routerLink]="['/c-details', p_details().category._id]" class="hover:text-emerald-600 transition-colors">{{p_details().category.name}}</a>
+        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        <span class="font-semibold text-gray-900 truncate max-w-xs">{{p_details().title}}</span>
+    </nav>
+
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8 lg:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+
+            <!-- Product Image Gallery (Left Column) -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+
+                <!-- Main Image Card -->
+                <div class="w-full aspect-square bg-gray-50/40 rounded-2xl border border-gray-100 p-4 sm:p-6 flex items-center justify-center overflow-hidden group">
+                    <img [title]="p_details().slug" [src]="mainImage() || p_details().imageCover" [alt]="p_details().title"
+                        class="w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105" />
+                </div>
+
+                <!-- Thumbnails Row -->
+                <owl-carousel-o class="dotClass" [options]="customOptions">
+                    @for (pImg of [p_details().imageCover].concat(p_details().images); track $index) {
+                    <ng-template carouselSlide [id]="'img-' + $index">
+                        <div class="w-full p-2 cursor-pointer" (click)="mainImage.set(pImg)">
+                            <img class="w-full object-cover border-2 rounded-md transition-colors"
+                                [class]="mainImage() === pImg ? 'border-emerald-500' : 'border-gray-400'"
+                                [src]="pImg" [alt]="p_details().title" [title]="p_details().slug">
+                        </div>
+                    </ng-template>
+                    }
+                </owl-carousel-o>
+            </div>
+
+            <!-- Product Details & Actions (Right Column) -->
+            <div class="lg:col-span-7 flex flex-col">
+
+                <!-- Badges (Category & Brand) -->
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <a [routerLink]="['/c-details', p_details().category._id]" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100">
+                        {{p_details().category.name}}
+                    </a>
+                    <a [routerLink]="['/b-details', p_details().brand._id]" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200">
+                        {{p_details().brand.name}}
+                    </a>
+                    @for (sub of p_details().subcategory; track sub._id) {
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-600 border border-gray-200">{{sub.name}}</span>
+                    }
+                </div>
+
+                <!-- Product Title -->
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
+                    {{p_details().title}}
+                </h1>
+
+                <!-- Rating & Review Count -->
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="flex items-center text-amber-400 text-sm gap-0.5" [attr.aria-label]="p_details().ratingsAverage + ' out of 5 stars'">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <i [class]="p_details().ratingsAverage >= star ? 'fa-solid fa-star' : p_details().ratingsAverage >= star - 0.5 ? 'fa-solid fa-star-half-stroke' : 'fa-regular fa-star'"></i>
+                        }
+                    </div>
+                    <span class="text-sm font-medium text-gray-500">
+                        {{p_details().ratingsAverage}} ({{p_details().ratingsQuantity}} reviews) · {{p_details().sold}} sold
+                    </span>
+                </div>
+
+                <!-- Price -->
+                <div class="flex items-end gap-3 mb-3">
+                    <span class="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                        {{(p_details().priceAfterDiscount || p_details().price) | currency : 'EGP ' : 'code' : '1.0-0'}}
+                    </span>
+                    @if (p_details().priceAfterDiscount) {
+                    <span class="text-lg text-gray-400 line-through">{{p_details().price | currency : 'EGP ' : 'code' : '1.0-0'}}</span>
+                    }
+                </div>
+
+                <!-- Stock Availability Pill -->
+                <div class="mb-5">
+                    @if (p_details().quantity > 0) {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        In Stock
+                    </span>
+                    } @else {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200/60">
+                        <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                        Out of Stock
+                    </span>
+                    }
+                </div>
+
+                <!-- Product Attributes / Description -->
+                <p class="text-sm sm:text-base text-gray-600 leading-relaxed mb-6 whitespace-pre-line">
+                    {{p_details().description}}
+                </p>
+
+                <!-- Quantity Selector Section -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                    <div class="flex items-center gap-4">
+                        <!-- Counter Box -->
+                        <div class="inline-flex items-center border border-gray-300 rounded-xl bg-white shadow-xs overflow-hidden">
+                            <button (click)="changeQuantity(-1)" [disabled]="quantity() <= 1" type="button" aria-label="Decrease quantity"
+                                class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40">
+                                <i class="fa-solid fa-minus text-xs"></i>
+                            </button>
+                            <span class="w-12 h-10 flex items-center justify-center text-sm sm:text-base font-semibold text-gray-900 select-none">
+                                {{quantity()}}
+                            </span>
+                            <button (click)="changeQuantity(1)" [disabled]="quantity() >= p_details().quantity" type="button" aria-label="Increase quantity"
+                                class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-40">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- Available Stock Info -->
+                        <span class="text-sm text-gray-500 font-medium">
+                            {{p_details().quantity}} available
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Total Price Card -->
+                <div class="bg-gray-50/90 border border-gray-100 rounded-2xl p-4 sm:p-5 flex items-center justify-between mb-6 shadow-xs">
+                    <span class="text-sm sm:text-base font-medium text-gray-700">Total Price:</span>
+                    <span class="text-xl sm:text-2xl font-bold text-emerald-600 tracking-tight">
+                        {{(p_details().priceAfterDiscount || p_details().price) * quantity() | currency : 'EGP ' : 'code' : '1.0-0'}}
+                    </span>
+                </div>
+
+                <!-- Primary Action Buttons (Add to Cart) -->
+                <div class="grid grid-cols-1 gap-3 mb-3">
+                    <button (click)="addToCart()" [disabled]="cartLoading() || p_details().quantity === 0" type="button"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-medium py-3.5 px-6 rounded-xl flex items-center justify-center gap-2.5 shadow-sm transition-all cursor-pointer disabled:opacity-60">
+                        @if (cartLoading()) {
+                        <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+                        <span>Adding...</span>
+                        } @else {
+                        <i class="fa-solid fa-cart-shopping text-sm"></i>
+                        <span>Add to Cart</span>
+                        }
+                    </button>
+                </div>
+
+                <!-- Secondary Action Buttons (Wishlist & Share) -->
+                <div class="flex items-center gap-3">
+                    <button (click)="toggleWishlist()" [disabled]="wishlistLoading()" type="button"
+                        class="flex-1 border font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition-all shadow-xs cursor-pointer"
+                        [class]="inWishlist() ? 'border-red-200 bg-red-50 text-red-600' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700'">
+                        <i class="text-sm" [class]="wishlistLoading() ? 'fa-solid fa-spinner fa-spin' : inWishlist() ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-500'"></i>
+                        <span>{{ inWishlist() ? 'Remove from Wishlist' : 'Add to Wishlist' }}</span>
+                    </button>
+                    <button (click)="shareProduct()" type="button" aria-label="Share product"
+                        class="w-11 h-11 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600 hover:text-gray-900 rounded-xl flex items-center justify-center transition-all shadow-xs cursor-pointer shrink-0">
+                        <i class="fa-solid fa-share-nodes text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="max-w-6xl mx-auto mt-8 bg-white rounded-3xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight mb-6 flex items-center gap-2.5">
+            <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+            Customer <span class="text-emerald-600">Reviews</span>
+            <span class="text-sm font-medium text-gray-400">({{reviews().length}})</span>
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Summary + form -->
+            <div class="bg-gray-50/90 border border-gray-100 rounded-2xl p-5 h-fit">
+                <div class="text-center">
+                    <p class="text-5xl font-extrabold text-gray-900">{{p_details().ratingsAverage}}</p>
+                    <div class="flex justify-center text-amber-400 gap-0.5 mt-1">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <i [class]="p_details().ratingsAverage >= star ? 'fa-solid fa-star' : p_details().ratingsAverage >= star - 0.5 ? 'fa-solid fa-star-half-stroke' : 'fa-regular fa-star'"></i>
+                        }
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Based on {{p_details().ratingsQuantity}} ratings</p>
+                </div>
+
+                @if (!_AuthenticationService.isLoggin()) {
+                <p class="text-sm text-gray-600 text-center mt-5">
+                    <a routerLink="/login" class="font-semibold text-emerald-600 hover:underline">Sign in</a> to write a review.
+                </p>
+                } @else if (myReview() && !editingReview()) {
+                <p class="text-sm text-gray-600 text-center mt-5">You've reviewed this product. You can edit or delete your review.</p>
+                } @else {
+                <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="mt-5 space-y-3">
+                    <h3 class="text-sm font-bold text-gray-900">{{ editingReview() ? 'Edit your review' : 'Write a review' }}</h3>
+                    <div class="flex items-center gap-1 text-xl">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <button type="button" (click)="reviewForm.get('rating')?.setValue(star)" class="cursor-pointer" [attr.aria-label]="star + ' stars'">
+                            <i [class]="star <= reviewForm.get('rating')?.value ? 'fa-solid fa-star text-amber-400' : 'fa-regular fa-star text-gray-300'"></i>
+                        </button>
+                        }
+                    </div>
+                    <textarea formControlName="review" rows="4" placeholder="Share your experience with this product..."
+                        class="fc-input resize-none" [class.invalid]="reviewForm.get('review')?.invalid && reviewForm.get('review')?.touched"></textarea>
+                    @if (reviewForm.get('review')?.invalid && reviewForm.get('review')?.touched) {
+                    <div class="fc-error"><i class="fa-solid fa-circle-exclamation shrink-0"></i> <span>Please write at least 3 characters</span></div>
+                    }
+                    <div class="flex gap-2">
+                        <button type="submit" [disabled]="savingReview()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60">
+                            @if (savingReview()) { <i class="fa-solid fa-spinner fa-spin"></i> }
+                            {{ editingReview() ? 'Update Review' : 'Submit Review' }}
+                        </button>
+                        @if (editingReview()) {
+                        <button type="button" (click)="cancelEdit()" class="px-4 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-white cursor-pointer">Cancel</button>
+                        }
+                    </div>
+                </form>
+                }
+            </div>
+
+            <!-- List -->
+            <div class="lg:col-span-2 space-y-3">
+                @for (review of visibleReviews(); track review._id) {
+                <div class="rounded-2xl border p-4" [class]="review._id === myReview()?._id ? 'border-emerald-200 bg-emerald-50/50' : 'border-gray-100'">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold uppercase flex items-center justify-center">
+                                {{ review.user?.name?.charAt(0) }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">
+                                    {{ review.user?.name }}
+                                    @if (review._id === myReview()?._id) { <span class="text-xs text-emerald-600 font-medium">(You)</span> }
+                                </p>
+                                <div class="flex items-center gap-2">
+                                    <span class="flex text-amber-400 text-[11px] gap-0.5">
+                                        @for (star of [1,2,3,4,5]; track star) {
+                                        <i [class]="review.rating >= star ? 'fa-solid fa-star' : 'fa-regular fa-star text-gray-300'"></i>
+                                        }
+                                    </span>
+                                    <span class="text-xs text-gray-400">{{ review.createdAt | date : 'mediumDate' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @if (review._id === myReview()?._id) {
+                        <div class="flex gap-1">
+                            <button type="button" (click)="startEdit(review)" aria-label="Edit review" class="w-8 h-8 rounded-lg text-gray-500 hover:text-emerald-600 hover:bg-white flex items-center justify-center cursor-pointer">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button type="button" (click)="deleteReview(review)" aria-label="Delete review" class="w-8 h-8 rounded-lg text-gray-500 hover:text-red-600 hover:bg-white flex items-center justify-center cursor-pointer">
+                                <i class="fa-regular fa-trash-can text-sm"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                    <p class="text-sm text-gray-700 mt-3">{{ review.review }}</p>
+                </div>
+                } @empty {
+                <div class="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
+                    <i class="fa-regular fa-comments text-3xl mb-2"></i>
+                    <p class="text-sm">No reviews yet. Be the first to review this product!</p>
+                </div>
+                }
+                @if (reviews().length > visibleReviews().length) {
+                <button type="button" (click)="reviewsShown.set(reviewsShown() + 5)"
+                    class="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-3 rounded-2xl border border-gray-200/80 text-sm cursor-pointer">
+                    Show more reviews ({{ reviews().length - visibleReviews().length }} remaining)
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Related products -->
+    @if (relatedProducts().length) {
+    <div class="max-w-6xl mx-auto mt-8">
+        <div class="flex items-center gap-2.5 mb-6">
+            <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+            <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+                Related <span class="text-emerald-600">Products</span>
+            </h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+            @for (product of relatedProducts(); track product._id) {
+            <app-product-card [product]="product" />
+            }
+        </div>
+    </div>
+    }
+</section>
+}
